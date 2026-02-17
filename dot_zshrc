@@ -1,0 +1,130 @@
+# Set up the prompt
+
+autoload -Uz promptinit
+promptinit
+# prompt adam1
+
+# HISTORY
+
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+setopt HIST_VERIFY
+setopt INC_APPEND_HISTORY_TIME
+
+# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
+HISTSIZE=10000
+SAVEHIST=10000
+HISTFILE=~/.zsh_history
+
+# ZSH OPTIONS
+setopt INTERACTIVECOMMENTS
+setopt EXTENDEDGLOB
+
+# Use emacs keybindings even if our EDITOR is set to vi
+bindkey -e
+
+# Use modern completion system
+if [ -d "$HOME/.plugins/zsh-completions/src" ]; then
+  fpath=("$HOME/.plugins/zsh-completions/src" $fpath)
+fi
+autoload -Uz compinit
+compinit
+
+# fix home/end keys in zellij
+# https://github.com/zellij-org/zellij/issues/496
+bindkey "^[[H" beginning-of-line
+bindkey "^[[F" end-of-line
+
+# add completions from prezto
+[ -f "$HOME/.plugins/prezto-zsh-completion-styles.zsh" ] &&
+  source "$HOME/.plugins/prezto-zsh-completion-styles.zsh"
+
+# fast-syntax-highlighting
+[ -f "$HOME/.plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] &&
+  source "$HOME/.plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+
+# testing zsh-history-substring-search
+if [ -f "$HOME/.plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
+  source "$HOME/.plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+  bindkey "$terminfo[kcuu1]" history-substring-search-up
+  bindkey "$terminfo[kcud1]" history-substring-search-down
+fi
+
+# testing zsh-autosuggestions
+[ -f "$HOME/.plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ] &&
+  source "$HOME/.plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+
+eval "$(fzf --zsh)"
+
+# source aliases
+if [[ -s "${ZDOTDIR:-$HOME}/.aliases" ]]; then
+  source "${ZDOTDIR:-$HOME}/.aliases"
+else
+  echo "ERROR: .zshrc: .aliases does not exist!"
+fi
+
+# source functions
+if [[ -s "${ZDOTDIR:-$HOME}/.functions" ]]; then
+  source "${ZDOTDIR:-$HOME}/.functions"
+else
+  echo "ERROR: .zshrc: .functions does not exist!"
+fi
+
+# source zd only to define the function
+if [[ -s "${ZDOTDIR:-$HOME}/bin/zd" ]]; then
+  source "${ZDOTDIR:-$HOME}/bin/zd"
+else
+  echo "ERROR: .zshrc: bin/zd does not exist!"
+fi
+
+# configure fzf to use bat for previews by default
+export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
+
+# remove % sign from curl output
+# https://unix.stackexchange.com/a/167600
+PROMPT_EOL_MARK=''
+
+# fix globbing
+# https://unix.stackexchange.com/a/310553
+set +o nomatch
+
+# fix removing space before pipe (|) character
+export ZLE_REMOVE_SUFFIX_CHARS=""
+
+# esb-tools server
+export ESB_TOOLS="***REMOVED***"
+
+# custom PATH
+export PATH="$HOME/bin:$PATH"
+
+# Azure CLI completion
+autoload bashcompinit && bashcompinit
+source $(brew --prefix)/etc/bash_completion.d/az
+
+# Activate mise
+eval "$(mise activate zsh)"
+
+# starship prompt
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+eval "$(starship init zsh)"
+
+# make VS Code the default editor
+export EDITOR="code -w"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/mystamax/.lmstudio/bin"
+# End of LM Studio CLI section
+
+# Add bootdev to path
+export PATH="$PATH:$HOME/go/bin"
+
+# Configure SSH_AUTH_LOCK for 1Password inside devcontainers
+export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
+# Add uv to path
+export PATH="$PATH:$HOME/.local/bin"

@@ -1,0 +1,102 @@
+/*
+ * Markdown PDF CSS styled with GitHub colors
+ */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+    padding: 0 12px;
+}
+
+/* Styling for <h1> through <h6> headers */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: bold;
+    /* Increase font weight for better visibility */
+    color: #24292f;
+    /* GitHub's header text color */
+}
+
+pre {
+    background-color: #f6f8fa;
+    /* GitHub code block background color */
+    border: 1px solid #d1d5da;
+    /* GitHub code block border color */
+    border-radius: 3px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+    padding: 16px;
+    /* GitHub code block padding */
+    line-height: 1.45;
+    /* GitHub code block line height */
+}
+
+blockquote {
+    background: #f1f8ff;
+    /* GitHub blockquote background color */
+    border-left: 0.25em solid #d0e9ff;
+    /* GitHub blockquote border color */
+    margin: 0;
+    /* GitHub blockquote margin adjustment */
+    padding: 0 1em;
+    /* GitHub blockquote padding */
+}
+
+.emoji {
+    height: 1.2em;
+    /* GitHub emoji height adjustment */
+    vertical-align: -0.075em;
+}
+
+code {
+    font-size: 14px;
+    line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs)>code {
+    color: #24292e;
+    /* GitHub inline code color */
+    font-size: inherit;
+    background-color: #AFB8C133;
+    padding: .2em .4em;
+    border-radius: 6px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 16px;
+    /* Add spacing below tables */
+}
+
+table th,
+table td {
+    padding: 6px 13px;
+    border: 1px solid #d1d5da;
+    /* GitHub table border color */
+}
+
+table th {
+    background-color: #f6f8fa;
+    /* GitHub table header background color */
+    font-weight: bold;
+}
+
+/* Alternate row colors */
+table tr:nth-child(even) {
+    background-color: #f6f8fa;
+    /* Alternate row background color */
+}
+
+/* Page Break : use <div class="page"/> to insert page break */
+.page {
+    page-break-after: always;
+}

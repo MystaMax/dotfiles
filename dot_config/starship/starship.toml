@@ -1,0 +1,25 @@
+[hostname]
+ssh_only = false
+
+[username]
+show_always = true
+format = '[$user](bold red) on '
+
+[python]
+format = 'via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+python_binary = 'python3'
+detect_extensions = []
+disabled = false
+
+[character]
+success_symbol = '[✔](bold green) '
+error_symbol = '[✘](bold red) '
+
+[directory]
+read_only = ' 🔒'
+
+[perl]
+disabled = true
+
+[vagrant]
+disabled = true

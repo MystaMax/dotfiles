@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+
+# Shell functions
+
+function cheat() {
+  curl https://cheat.sh/"${1}"
+}
+
+function gi() {
+  curl -sLw "\n" https://www.toptal.com/developers/gitignore/api/"$@"
+}
+
+# color pagination with jq
+# https://github.com/stedolan/jq/issues/764#issuecomment-379688272
+
+jql() {
+  # -F tell less exit if output content can be displayed on one screen
+  jq -C "$@" | less -FR
+}
+
+# Navigate to ~/customers
+# The ARGV variable is need because you cannot access positional arguments
+# inside a bash function without the ARGV array
+args=("$@")
+
+function customers {
+  echo "${args[1]}"
+  cd ~/customers/"${args[1]}"
+}
+
+# Print $PATH line-by-line
+function echopath {
+  echo "${PATH}" | tr : '\n'
+}
+
+zdt() {
+  local target_directory="zd$1"
+  local found_directory
+
+  #found_directory=$(find ~/customers -type d -name "$target_directory" -print -quit)
+  found_directory=$(fd -t d -g "*$target_directory" ~/customers)
+
+  if [[ -n "$found_directory" ]]; then
+    cd "$found_directory" || exit
+    echo "Changed to directory: $found_directory"
+  else
+    echo "Directory '$target_directory' not found."
+  fi
+}
+
+# Read a Slack thread via gh and either copy or print
+slackread() {
+  local mode="copy"
+  local limit=400
+
+  # Parse options
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+    -p | --print)
+      mode="print"
+      shift
+      ;;
+    -c | --copy)
+      mode="copy"
+      shift
+      ;;
+    -l | --limit)
+      limit="$2"
+      shift 2
+      ;;
+    -h | --help)
+      echo "Usage: slackread [OPTIONS] <SLACK-THREAD-URL>"
+      echo
+      echo "Options:"
+      echo "  -c, --copy    Copy thread to clipboard (default)"
+      echo "  -p, --print   Print thread to terminal"
+      echo "  -l, --limit N Set message limit (default: 400)"
+      return 0
+      ;;
+    *)
+      break
+      ;;
+    esac
+  done
+
+  if [ "$#" -lt 1 ]; then
+    echo "Usage: slackread [OPTIONS] <SLACK-THREAD-URL>" >&2
+    return 1
+  fi
+
+  local url="$1"
+
+  if [ "$mode" = "copy" ]; then
+    gh slack read -l "$limit" "$url" | pbcopy
+  else
+    gh slack read -l "$limit" "$url"
+  fi
+}
