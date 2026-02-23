@@ -107,11 +107,15 @@ if command -v fzf &> /dev/null; then
 fi
 
 # Activate mise
-eval "$(mise activate zsh)"
+if command -v mise &> /dev/null; then
+  eval "$(mise activate zsh)"
+fi
 
 # starship prompt
-export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-eval "$(starship init zsh)"
+if command -v starship &> /dev/null; then
+  export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+  eval "$(starship init zsh)"
+fi
 
 # ===================
 # PATH
@@ -126,7 +130,9 @@ export PATH="$PATH:$HOME/.local/bin"
 # environment
 # ===================
 
-export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
+if command -v bat &> /dev/null; then
+  export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
+fi
 export ZLE_REMOVE_SUFFIX_CHARS=""
 
 # Configure SSH_AUTH_SOCK for 1Password
