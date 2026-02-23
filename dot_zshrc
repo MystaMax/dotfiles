@@ -42,7 +42,12 @@ if [ -d "$HOME/.config/zsh/plugins/zsh-completions/src" ]; then
   fpath=("$HOME/.config/zsh/plugins/zsh-completions/src" $fpath)
 fi
 autoload -Uz compinit
-compinit
+# only regenerate compinit dump once per day
+if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
 
 [ -f "$HOME/.config/zsh/plugins/prezto-zsh-completion-styles.zsh" ] &&
   source "$HOME/.config/zsh/plugins/prezto-zsh-completion-styles.zsh"
@@ -50,7 +55,7 @@ compinit
 # Azure CLI completion
 if [[ "$(uname)" == "Darwin" ]] && command -v brew &> /dev/null; then
   autoload bashcompinit && bashcompinit
-  source $(brew --prefix)/etc/bash_completion.d/az
+  source "$(brew --prefix 2>/dev/null || echo /opt/homebrew)"/etc/bash_completion.d/az
 fi
 
 # ===================
@@ -106,9 +111,9 @@ if command -v fzf &> /dev/null; then
   eval "$(fzf --zsh)"
 fi
 
-# Activate mise
+# Activate mise (lazy to avoid slowing every prompt)
 if command -v mise &> /dev/null; then
-  eval "$(mise activate zsh)"
+  eval "$(mise activate zsh --shims)"
 fi
 
 # starship prompt
