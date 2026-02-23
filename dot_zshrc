@@ -1,10 +1,6 @@
-# Set up the prompt
-
-autoload -Uz promptinit
-promptinit
-# prompt adam1
-
-# HISTORY
+# ===================
+# history
+# ===================
 
 setopt EXTENDED_HISTORY
 setopt HIST_EXPIRE_DUPS_FIRST
@@ -16,95 +12,99 @@ setopt HIST_SAVE_NO_DUPS
 setopt HIST_VERIFY
 setopt INC_APPEND_HISTORY_TIME
 
-# Keep 1000 lines of history within the shell and save it to ~/.zsh_history:
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
 
-# ZSH OPTIONS
+# ===================
+# options & keybindings
+# ===================
+
 setopt INTERACTIVECOMMENTS
 setopt EXTENDEDGLOB
 
 # Use emacs keybindings even if our EDITOR is set to vi
 bindkey -e
 
-# Use modern completion system
-if [ -d "$HOME/.plugins/zsh-completions/src" ]; then
-  fpath=("$HOME/.plugins/zsh-completions/src" $fpath)
-fi
-autoload -Uz compinit
-compinit
-
 # fix home/end keys in zellij
 # https://github.com/zellij-org/zellij/issues/496
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
 
-# add completions from prezto
-[ -f "$HOME/.plugins/prezto-zsh-completion-styles.zsh" ] &&
-  source "$HOME/.plugins/prezto-zsh-completion-styles.zsh"
+# ===================
+# completions
+# ===================
+
+autoload -Uz promptinit
+promptinit
+
+if [ -d "$HOME/.config/zsh/plugins/zsh-completions/src" ]; then
+  fpath=("$HOME/.config/zsh/plugins/zsh-completions/src" $fpath)
+fi
+autoload -Uz compinit
+compinit
+
+[ -f "$HOME/.config/zsh/plugins/prezto-zsh-completion-styles.zsh" ] &&
+  source "$HOME/.config/zsh/plugins/prezto-zsh-completion-styles.zsh"
+
+# Azure CLI completion
+if [[ "$(uname)" == "Darwin" ]] && command -v brew &> /dev/null; then
+  autoload bashcompinit && bashcompinit
+  source $(brew --prefix)/etc/bash_completion.d/az
+fi
+
+# ===================
+# plugins
+# ===================
 
 # fast-syntax-highlighting
-[ -f "$HOME/.plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] &&
-  source "$HOME/.plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
+[ -f "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh" ] &&
+  source "$HOME/.config/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh"
 
-# testing zsh-history-substring-search
-if [ -f "$HOME/.plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
-  source "$HOME/.plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
+# zsh-history-substring-search
+if [ -f "$HOME/.config/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh" ]; then
+  source "$HOME/.config/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh"
   bindkey "$terminfo[kcuu1]" history-substring-search-up
   bindkey "$terminfo[kcud1]" history-substring-search-down
 fi
 
-# testing zsh-autosuggestions
-[ -f "$HOME/.plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ] &&
-  source "$HOME/.plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
+# zsh-autosuggestions
+[ -f "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh" ] &&
+  source "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
-eval "$(fzf --zsh)"
+# ===================
+# editor
+# ===================
 
-# source aliases
-if [[ -s "${ZDOTDIR:-$HOME}/.aliases" ]]; then
-  source "${ZDOTDIR:-$HOME}/.aliases"
+if command -v nvim &> /dev/null; then
+  export EDITOR='nvim'
+elif command -v code &> /dev/null; then
+  export EDITOR='code -w'
+elif command -v vim &> /dev/null; then
+  export EDITOR='vim'
 else
-  echo "ERROR: .zshrc: .aliases does not exist!"
+  export EDITOR='vi'
 fi
 
-# source functions
-if [[ -s "${ZDOTDIR:-$HOME}/.functions" ]]; then
-  source "${ZDOTDIR:-$HOME}/.functions"
-else
-  echo "ERROR: .zshrc: .functions does not exist!"
+# ===================
+# sources
+# ===================
+# All zsh config modules live in: ~/.config/zsh/
+#   - aliases.zsh    (shell aliases)
+#   - functions.zsh  (shell functions)
+# To edit:  ls ~/.config/zsh/
+
+for f in "$HOME/.config/zsh/"*.zsh; do
+  [ -f "$f" ] && source "$f"
+done
+
+# ===================
+# tools
+# ===================
+
+if command -v fzf &> /dev/null; then
+  eval "$(fzf --zsh)"
 fi
-
-# source zd only to define the function
-if [[ -s "${ZDOTDIR:-$HOME}/bin/zd" ]]; then
-  source "${ZDOTDIR:-$HOME}/bin/zd"
-else
-  echo "ERROR: .zshrc: bin/zd does not exist!"
-fi
-
-# configure fzf to use bat for previews by default
-export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
-
-# remove % sign from curl output
-# https://unix.stackexchange.com/a/167600
-PROMPT_EOL_MARK=''
-
-# fix globbing
-# https://unix.stackexchange.com/a/310553
-set +o nomatch
-
-# fix removing space before pipe (|) character
-export ZLE_REMOVE_SUFFIX_CHARS=""
-
-# esb-tools server
-export ESB_TOOLS="***REMOVED***"
-
-# custom PATH
-export PATH="$HOME/bin:$PATH"
-
-# Azure CLI completion
-autoload bashcompinit && bashcompinit
-source $(brew --prefix)/etc/bash_completion.d/az
 
 # Activate mise
 eval "$(mise activate zsh)"
@@ -113,18 +113,37 @@ eval "$(mise activate zsh)"
 export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 eval "$(starship init zsh)"
 
-# make VS Code the default editor
-export EDITOR="code -w"
+# ===================
+# PATH
+# ===================
 
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/mystamax/.lmstudio/bin"
-# End of LM Studio CLI section
-
-# Add bootdev to path
+export PATH="$HOME/bin:$PATH"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 export PATH="$PATH:$HOME/go/bin"
-
-# Configure SSH_AUTH_LOCK for 1Password inside devcontainers
-export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
-
-# Add uv to path
 export PATH="$PATH:$HOME/.local/bin"
+
+# ===================
+# environment
+# ===================
+
+export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
+export ZLE_REMOVE_SUFFIX_CHARS=""
+
+# Configure SSH_AUTH_SOCK for 1Password
+if [[ "$(uname)" == "Darwin" ]]; then
+  export SSH_AUTH_SOCK=~/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+elif [[ "$(uname)" == "Linux" ]]; then
+  export SSH_AUTH_SOCK=~/.1password/agent.sock
+fi
+
+# ===================
+# fixes
+# ===================
+
+# remove % sign from curl output
+# https://unix.stackexchange.com/a/167600
+PROMPT_EOL_MARK=''
+
+# fix globbing
+# https://unix.stackexchange.com/a/310553
+set +o nomatch
