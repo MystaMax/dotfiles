@@ -1,21 +1,27 @@
-copy-on-select = true 
+# appearance
 cursor-style = block
 cursor-style-blink = false
 font-family = UbuntuMono Nerd Font Mono
 font-size = 16
 font-thicken = true
+macos-titlebar-style = hidden
+theme = mysta
+window-theme = auto
+
+# keybinds
 keybind = cmd+shift+,=reload_config
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
 keybind = cmd+b=esc:b
 keybind = cmd+f=esc:f
 keybind = cmd+period=esc:.
-keybind = cmd+left=text:\x1bOH
+# Home/End also configured via Karabiner on macOS
+# keybind = cmd+left=text:\x1bOH
 # keybind = cmd+right=text:\x1bOF
 keybind = cmd+backspace=text:\x1b\x7f
 keybind = super+t=unbind
 keybind = super+n=unbind
-macos-titlebar-style = hidden
+
+# behavior
+copy-on-select = true
 quick-terminal-position = top
 quit-after-last-window-closed = true
-theme = mysta
-window-theme = auto
