@@ -104,20 +104,46 @@ You'll be prompted for template values (name, email, signing key) on first run.
 
 ### Day-to-Day Usage
 
-```bash
-# Pull latest changes and apply
-chezmoi update
+There are two workflows for editing managed files:
 
-# Edit a managed file (opens in $EDITOR, applies on save)
+**Edit the actual file, then sync to chezmoi:**
+
+```bash
+# 1. Edit the file however you normally would
+vim ~/.zshrc
+
+# 2. Pull changes into chezmoi source
+chezmoi add ~/.zshrc
+
+# 3. Commit and push
+cd ~/.local/share/chezmoi && git add -A && git commit -m "your message" && git push
+```
+
+**Edit through chezmoi directly:**
+
+```bash
+# Opens the chezmoi source copy in $EDITOR, applies on save
 chezmoi edit ~/.zshrc
+
+# Then commit and push
+cd ~/.local/share/chezmoi && git add -A && git commit -m "your message" && git push
+```
+
+The first approach feels more natural — just edit your files as usual and run `chezmoi add` when you're happy. The second skips the `add` step since you're editing the source directly.
+
+**Other useful commands:**
+
+```bash
+# Pull latest changes from remote and apply to home directory
+chezmoi update
 
 # Add a new file to chezmoi management
 chezmoi add ~/.config/some/new-config
 
-# See what chezmoi would change
+# See what chezmoi would change before applying
 chezmoi diff
 
-# Apply changes from source to home directory
+# Apply all pending changes from source to home directory
 chezmoi apply
 ```
 
