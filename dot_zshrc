@@ -151,6 +151,13 @@ fi
 # fixes
 # ===================
 
+# Ghostty sets TERM=xterm-ghostty, but remote systems may not have
+# that terminfo entry. This causes character duplication in plugins
+# like zsh-autosuggestions over SSH. Fall back to xterm-256color.
+if [[ "$TERM" == "xterm-ghostty" ]] && ! infocmp xterm-ghostty >/dev/null 2>&1; then
+  export TERM="xterm-256color"
+fi
+
 # remove % sign from curl output
 # https://unix.stackexchange.com/a/167600
 PROMPT_EOL_MARK=''
