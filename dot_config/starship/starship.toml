@@ -23,3 +23,6 @@ disabled = true
 
 [vagrant]
 disabled = true
+
+# Increase command timeout to avoid git warnings on slow connections
+command_timeout = 1000
