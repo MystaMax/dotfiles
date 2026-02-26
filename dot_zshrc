@@ -41,6 +41,11 @@ promptinit
 if [ -d "$HOME/.config/zsh/plugins/zsh-completions/src" ]; then
   fpath=("$HOME/.config/zsh/plugins/zsh-completions/src" $fpath)
 fi
+# Ensure Homebrew completions are in fpath (brew shellenv sets FPATH
+# but the zsh fpath array may not inherit it before compinit runs)
+if [[ "$(uname)" == "Darwin" ]] && [ -d /opt/homebrew/share/zsh/site-functions ]; then
+  fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
+fi
 autoload -Uz compinit
 # only regenerate compinit dump once per day
 if [[ -n ~/.zcompdump(#qN.mh+24) ]]; then
