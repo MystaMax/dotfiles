@@ -11,6 +11,7 @@ Adhere to the seven rules for Git commit messages:
 5. Use the imperative mood (e.g., "Add feature" not "Added feature").
 6. Wrap body lines at 72 characters.
 7. Use the body to explain _what_ and _why_, not _how_.
+8. Use a bulleted list (`-`) in the body instead of prose paragraphs.
 
 ### Format
 
@@ -37,6 +38,7 @@ Adhere to the seven rules for Git commit messages:
 - Keep functions small and focused on a single responsibility.
 - Handle errors explicitly — avoid silently swallowing exceptions.
 - Prefer early returns over deeply nested conditionals.
+- Prefer `rg` (ripgrep) over `grep` for searching file contents.
 
 ## Environment
 
