@@ -141,7 +141,10 @@ export PATH="$PATH:$HOME/.local/bin"
 # ===================
 
 if command -v bat &> /dev/null; then
+  # Use bat preview for file/dir completion (e.g., ls **<tab>)
   export FZF_DEFAULT_OPTS="--preview 'bat --color=always {}'"
+  # Disable preview for history search (ctrl-r) — it's just noise there
+  export FZF_CTRL_R_OPTS="--preview ''"
 fi
 export ZLE_REMOVE_SUFFIX_CHARS=""
 
