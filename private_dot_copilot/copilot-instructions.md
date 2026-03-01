@@ -40,6 +40,13 @@ Adhere to the seven rules for Git commit messages:
 - Prefer early returns over deeply nested conditionals.
 - Prefer `rg` (ripgrep) over `grep` for searching file contents.
 
+## Language-Specific
+
+### Python
+
+- Use `uv` for package and environment management. Avoid `pip`.
+- Use `ruff` for linting and formatting. Avoid `black`, `isort`, and `flake8`.
+
 ## Environment
 
 - **OS:** macOS (primary), Linux
