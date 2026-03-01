@@ -53,3 +53,4 @@ Adhere to the seven rules for Git commit messages:
 - **Shell:** zsh
 - **Terminal:** Ghostty with Zellij
 - **Editor:** Neovim (primary), VS Code
+- **Dev Containers:** Preferred for new projects when practical. Suggest devcontainer setup for new projects, but don't force it on existing ones. Always include the `yzhang.markdown-all-in-one` VS Code extension.
