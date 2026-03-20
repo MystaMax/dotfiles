@@ -8,3 +8,9 @@ fi
 if [[ "$(uname)" == "Darwin" ]] && [ -f ~/.orbstack/shell/init.zsh ]; then
   source ~/.orbstack/shell/init.zsh
 fi
+
+# PATH
+export PATH="$HOME/bin:$PATH"
+export PATH="$PATH:$HOME/.lmstudio/bin"
+export PATH="$PATH:$HOME/go/bin"
+export PATH="$PATH:$HOME/.local/bin"
