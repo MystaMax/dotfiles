@@ -33,6 +33,7 @@ bindkey -e
 # https://github.com/zellij-org/zellij/issues/496
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
+bindkey "^[[3~" delete-char
 
 # ===================
 # completions

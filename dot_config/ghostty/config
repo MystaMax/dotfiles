@@ -24,4 +24,5 @@ keybind = super+n=unbind
 # behavior
 copy-on-select = true
 quick-terminal-position = top
+confirm-close-surface = false
 quit-after-last-window-closed = true
