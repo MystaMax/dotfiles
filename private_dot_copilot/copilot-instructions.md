@@ -1,34 +1,8 @@
 # Global Instructions
 
-## Git Commit Message Rules
+## Git Commit Messages
 
-Adhere to the seven rules for Git commit messages:
-
-1. Separate subject and body with a blank line.
-2. Limit subject to 50 characters.
-3. Capitalize the subject.
-4. Do not end the subject with a period.
-5. Use the imperative mood (e.g., "Add feature" not "Added feature").
-6. Wrap body lines at 72 characters.
-7. Use the body to explain _what_ and _why_, not _how_.
-8. Use a bulleted list (`-`) in the body instead of prose paragraphs.
-
-### Format
-
-`[EMOJI] (scope): [CONCISE SUBJECT]`
-
-### Emoji Map
-
-| Category         | Emojis                                                        |
-| :--------------- | :------------------------------------------------------------ |
-| **Setup & Meta** | 🎉 Initial, 🔖 Version, 🗂 Metadata, 🔧 Config, 🚚 Move/Rename |
-| **Development**  | ✨ Feature, ⚡ Update, 🎨 Structure, 🔨 Refactor, 🔥 Remove   |
-| **Fixes**        | 🐛 Bugfix, 🚑 Critical, 🍎 macOS, 🐧 Linux, 🏁 Windows        |
-| **Docs & Style** | 📚 Docs, 💡 Code Docs, 💄 Cosmetic, ✏️ Text, 👽 Translation   |
-| **DevOps & CI**  | 🚀 Deploy, 💚 CI, 👷‍♂️ Build, 🐳 Docker, 📦 Package             |
-| **Quality**      | 🚨 Tests, ✅ Add Test, ✔️ Pass Test, 🔒 Security, 👕 Lint     |
-| **Dependencies** | ⬆️ Upgrade, ⬇️ Downgrade, ➕ Add, ➖ Remove                   |
-| **Process**      | 🚧 WIP, 🔀 Merge, ⏪ Revert, 💥 Breaking, 👌 Review, 🦽 A11y  |
+Use the `git-commit` skill for commit message formatting and conventions.
 
 ## Coding Preferences
 
@@ -39,6 +13,10 @@ Adhere to the seven rules for Git commit messages:
 - Handle errors explicitly — avoid silently swallowing exceptions.
 - Prefer early returns over deeply nested conditionals.
 - Prefer `rg` (ripgrep) over `grep` for searching file contents.
+
+## Writing Style & Formatting
+
+- Never use em dashes (—) in writing. Instead, use other punctuation like periods, commas, colons, semicolons, or parentheses as appropriate. For example: use a period to end a sentence, a colon to introduce a list, a semicolon to join related clauses, or parentheses for asides.
 
 ## Language-Specific
 
