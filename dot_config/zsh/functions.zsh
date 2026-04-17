@@ -146,3 +146,15 @@ function zd() {
     create_dirs
     change_to_dir
 }
+
+# Launch Copilot CLI in YOLO mode. When run anywhere under ~/customers,
+# load shared instructions from ~/customers/AGENTS.md via
+# COPILOT_CUSTOM_INSTRUCTIONS_DIRS so customer subfolders inherit the rules.
+cpy() {
+    local customers_dir="$HOME/customers"
+    if [[ "$PWD" == "$customers_dir" || "$PWD" == "$customers_dir"/* ]]; then
+        COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$customers_dir" copilot --yolo "$@"
+    else
+        copilot --yolo "$@"
+    fi
+}

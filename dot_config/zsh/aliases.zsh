@@ -37,7 +37,6 @@ alias ping='prettyping --nolegend'
 
 # utilities
 alias ap='ansible-playbook'
-alias cpy='copilot --yolo'
 alias history-stat="history 0 | awk '{print \$2}' | sort | uniq -c | sort -n -r | head"
 
 # linux
