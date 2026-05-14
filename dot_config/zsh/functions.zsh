@@ -152,9 +152,42 @@ function zd() {
 # COPILOT_CUSTOM_INSTRUCTIONS_DIRS so customer subfolders inherit the rules.
 cpy() {
     local customers_dir="$HOME/customers"
+    local name_args=()
+    local force_new=false
+    local check_dir="$PWD"
+
+    # Parse cpy-specific flags before passing rest to copilot
+    local cpy_args=()
+    for arg in "$@"; do
+        if [[ "$arg" == "-n" || "$arg" == "--new" ]]; then
+            force_new=true
+        else
+            cpy_args+=("$arg")
+        fi
+    done
+
+    # Walk up to find a ticket root (~/customers/*/tickets/zd<id>)
+    while [[ "$check_dir" == "$customers_dir"/* ]]; do
+        if [[ "$check_dir" =~ "$HOME/customers/[^/]+/tickets/(zd[0-9]+)$" ]]; then
+            local session_name="${match[1]}"
+            if ! $force_new; then
+                local existing
+                existing=$(rg -l "^name: ${session_name}$" \
+                    ~/.copilot/session-state/*/workspace.yaml 2>/dev/null | head -1)
+                if [[ -n "$existing" ]]; then
+                    name_args=(--resume="$session_name")
+                else
+                    name_args=(--name "$session_name")
+                fi
+            fi
+            break
+        fi
+        check_dir="${check_dir:h}"
+    done
+
     if [[ "$PWD" == "$customers_dir" || "$PWD" == "$customers_dir"/* ]]; then
-        COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$customers_dir" copilot --yolo "$@"
+        COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$customers_dir" copilot --yolo "${name_args[@]}" "${cpy_args[@]}"
     else
-        copilot --yolo "$@"
+        copilot --yolo "${name_args[@]}" "${cpy_args[@]}"
     fi
 }
