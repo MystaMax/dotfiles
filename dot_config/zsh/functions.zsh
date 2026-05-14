@@ -191,3 +191,35 @@ cpy() {
         copilot --yolo "${name_args[@]}" "${cpy_args[@]}"
     fi
 }
+
+# zellij-health: list every running Zellij server with CPU%, age, and PID,
+# sorted by CPU descending. Anything sustained above 50% gets a warning
+# marker — likely the session-manager plugin FD leak kicking in
+# (see zellij-org/zellij#5056). Long-lived servers (multi-day uptime)
+# are the usual suspects.
+#
+# Use when fans spin up or the machine feels sluggish. Kill any flagged
+# server with `kill -9 <pid>`. Sessions are preserved by serialization
+# and can be resurrected with `zellij attach <name>`.
+#
+# Added 2026-05-14 during a Copilot CLI troubleshooting session that
+# uncovered two Zellij servers consuming 460%+ CPU combined after running
+# for 7-9 days each.
+zellij-health() {
+    if ! pgrep -x zellij >/dev/null 2>&1; then
+        echo "No Zellij servers running."
+        return 0
+    fi
+
+    printf "SESSION              CPU%%      AGE             PID\n"
+    ps -axo pid,pcpu,etime,command | awk '
+        /[z]ellij --server/ {
+            session = $NF
+            sub(/.*\//, "", session)
+            cpu = $2 + 0
+            warn = (cpu > 50) ? " ⚠️ " : ""
+            # Prepend zero-padded CPU as sort key, strip with cut after sort
+            printf "%015.2f\t%-20s %6.1f%%  %-15s  %s%s\n", \
+                cpu, session, cpu, $3, $1, warn
+        }' | sort -rn | cut -f2-
+}
