@@ -32,3 +32,9 @@ Use the `git-commit` skill for commit message formatting and conventions.
 - **Terminal:** Ghostty with Zellij
 - **Editor:** Neovim (primary), VS Code
 - **Dev Containers:** Preferred for new projects when practical. Suggest devcontainer setup for new projects, but don't force it on existing ones. Always include the `yzhang.markdown-all-in-one` VS Code extension.
+
+## Skills
+
+- **Source of truth:** `~/.agents/skills/` is the canonical location for all skills. Always look here first.
+- **Symlinks:** `~/.copilot/skills` and `~/.claude/skills` are symlinks pointing to `~/.agents/skills/`. If you encounter these paths, resolve the symlink; they all lead to the same place.
+- When searching for skills, modifying skills, or referencing skill paths, always use `~/.agents/skills/` as the authoritative directory.
