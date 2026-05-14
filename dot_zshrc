@@ -173,3 +173,15 @@ PROMPT_EOL_MARK=''
 # fix globbing
 # https://unix.stackexchange.com/a/310553
 set +o nomatch
+
+# bun completions
+[ -s "/Users/mystamax/.bun/_bun" ] && source "/Users/mystamax/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/Users/mystamax/.lmstudio/bin"
+# End of LM Studio CLI section
+
