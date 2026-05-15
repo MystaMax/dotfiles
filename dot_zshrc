@@ -118,6 +118,14 @@ done
 
 if command -v fzf &> /dev/null; then
   eval "$(fzf --zsh)"
+
+  # Only fire Ctrl+T's file picker when the prompt has something typed.
+  # An empty-prompt Ctrl+T is almost always an accidental hit.
+  fzf-file-widget-if-typed() {
+    [[ -n "${BUFFER//[[:space:]]/}" ]] && zle fzf-file-widget
+  }
+  zle -N fzf-file-widget-if-typed
+  bindkey '^T' fzf-file-widget-if-typed
 fi
 
 # Activate mise (lazy to avoid slowing every prompt)
