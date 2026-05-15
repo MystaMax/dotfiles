@@ -120,7 +120,12 @@ if command -v fzf &> /dev/null; then
   eval "$(fzf --zsh)"
 
   # Only fire Ctrl+T's file picker when the prompt has something typed.
-  # An empty-prompt Ctrl+T is almost always an accidental hit.
+  # An empty-prompt Ctrl+T is almost always an accidental hit; the file
+  # picker only makes sense when you're building a command (e.g. `vim `).
+  # Ctrl+R (history) and Alt+C (cd) are left untouched.
+  # NOTE: inside tmux, Ctrl+T enters the tab_mode key table (see
+  # ~/.config/tmux/tmux.conf) and never reaches the shell, so this
+  # binding only matters outside tmux or in nested sessions.
   fzf-file-widget-if-typed() {
     [[ -n "${BUFFER//[[:space:]]/}" ]] && zle fzf-file-widget
   }
