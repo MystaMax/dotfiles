@@ -21,6 +21,16 @@ keybind = cmd+backspace=text:\x1b\x7f
 keybind = super+t=unbind
 keybind = super+n=unbind
 
+# Map shift+enter to the same bytes as option+enter (ESC + CR).
+# Reason: tmux 3.5a can't distinguish shift+enter from plain enter
+# without the kitty keyboard protocol (which tmux doesn't support),
+# so TUIs like Copilot CLI / Claude Code / Gemini CLI can't use
+# shift+enter for multiline newlines while running inside tmux.
+# Rewriting at Ghostty bypasses tmux entirely. Outside tmux, the
+# remap is a harmless no-op (every modern TUI treats meta+enter and
+# shift+enter the same way: insert a newline).
+keybind = shift+enter=text:\x1b\r
+
 # behavior
 copy-on-select = true
 quick-terminal-position = top
