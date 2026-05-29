@@ -150,46 +150,160 @@ function zd() {
 # Launch Copilot CLI in YOLO mode. When run anywhere under ~/customers,
 # load shared instructions from ~/customers/AGENTS.md via
 # COPILOT_CUSTOM_INSTRUCTIONS_DIRS so customer subfolders inherit the rules.
+#
+# Ticket-dir behavior (~/customers/<co>/tickets/zd<id>):
+#   - Resumes the most-recently-used session for the ticket by matching cwd
+#     (not name), so renaming the session in-CLI doesn't break resume.
+#   - Caches the resolved session UUID at
+#     ~/.copilot/session-state/.cpy-cache/<co>__zd<id> for sub-millisecond
+#     resume on subsequent launches.
+#   - Flags (intercepted by cpy, never forwarded to copilot):
+#       -n / --new   force a fresh session (clears cache)
+#       -P / --pick  interactively pick among multiple sessions for this ticket
 cpy() {
     local customers_dir="$HOME/customers"
+    local state_dir="$HOME/.copilot/session-state"
+    local cache_dir="$state_dir/.cpy-cache"
     local name_args=()
     local force_new=false
+    local pick=false
     local check_dir="$PWD"
 
     # Parse cpy-specific flags before passing rest to copilot
     local cpy_args=()
+    local arg
     for arg in "$@"; do
-        if [[ "$arg" == "-n" || "$arg" == "--new" ]]; then
-            force_new=true
-        else
-            cpy_args+=("$arg")
-        fi
+        case "$arg" in
+            -n|--new)  force_new=true ;;
+            -P|--pick) pick=true ;;
+            *)         cpy_args+=("$arg") ;;
+        esac
     done
 
-    # Walk up to find a ticket root (~/customers/*/tickets/zd<id>)
+    # Walk up to find a ticket root (~/customers/<co>/tickets/zd<id>)
+    local ticket_root="" company="" session_name=""
     while [[ "$check_dir" == "$customers_dir"/* ]]; do
-        if [[ "$check_dir" =~ "$HOME/customers/[^/]+/tickets/(zd[0-9]+)$" ]]; then
-            local session_name="${match[1]}"
-            if ! $force_new; then
-                local existing
-                existing=$(rg -l "^name: ${session_name}$" \
-                    ~/.copilot/session-state/*/workspace.yaml 2>/dev/null | head -1)
-                if [[ -n "$existing" ]]; then
-                    name_args=(--resume="$session_name")
-                else
-                    name_args=(--name "$session_name")
-                fi
-            fi
+        if [[ "$check_dir" =~ "$HOME/customers/([^/]+)/tickets/(zd[0-9]+)$" ]]; then
+            company="${match[1]}"
+            session_name="${match[2]}"
+            ticket_root="$check_dir"
             break
         fi
         check_dir="${check_dir:h}"
     done
+
+    if [[ -n "$ticket_root" ]]; then
+        local cache_file="$cache_dir/${company}__${session_name}"
+        local resume_uuid=""
+
+        if ! $force_new; then
+            # Tier 1: cache hot path (skip when -P, user wants to choose)
+            if ! $pick && [[ -r "$cache_file" ]]; then
+                local cached_uuid
+                cached_uuid="$(<$cache_file)"
+                if [[ -n "$cached_uuid" && -d "$state_dir/$cached_uuid" ]]; then
+                    if head -n 20 "$state_dir/$cached_uuid/workspace.yaml" 2>/dev/null \
+                        | grep -qxF "cwd: $ticket_root"; then
+                        resume_uuid="$cached_uuid"
+                    fi
+                fi
+            fi
+
+            # Tier 2: cold scan
+            if [[ -z "$resume_uuid" ]]; then
+                local matches_str
+                matches_str="$(rg -l "^cwd: ${ticket_root}$" "$state_dir" \
+                    --glob 'workspace.yaml' --max-depth 2 2>/dev/null)"
+                local -a matches
+                [[ -n "$matches_str" ]] && matches=("${(@f)matches_str}")
+
+                if (( ${#matches} > 0 )); then
+                    if $pick && (( ${#matches} > 1 )); then
+                        resume_uuid="$(_cpy_pick_session "${matches[@]}")"
+                    else
+                        # Most recently modified workspace.yaml wins
+                        local f mtime newest_file="" newest_mtime=0
+                        for f in "${matches[@]}"; do
+                            mtime=$(stat -f "%m" "$f" 2>/dev/null) || continue
+                            if (( mtime > newest_mtime )); then
+                                newest_mtime=$mtime
+                                newest_file="$f"
+                            fi
+                        done
+                        [[ -n "$newest_file" ]] && resume_uuid="${newest_file:h:t}"
+                    fi
+                fi
+            fi
+        fi
+
+        if [[ -n "$resume_uuid" ]]; then
+            name_args=(--session-id="$resume_uuid")
+            mkdir -p "$cache_dir"
+            print -r -- "$resume_uuid" > "$cache_file"
+        else
+            # Fresh session: let Copilot generate the UUID. Drop any stale cache
+            # so the next cpy launch picks up the new session via cold scan.
+            name_args=(--name "$session_name")
+            [[ -f "$cache_file" ]] && rm -f "$cache_file"
+        fi
+    fi
 
     if [[ "$PWD" == "$customers_dir" || "$PWD" == "$customers_dir"/* ]]; then
         COPILOT_CUSTOM_INSTRUCTIONS_DIRS="$customers_dir" copilot --yolo "${name_args[@]}" "${cpy_args[@]}"
     else
         copilot --yolo "${name_args[@]}" "${cpy_args[@]}"
     fi
+}
+
+# Interactive picker for cpy. Takes workspace.yaml paths, prints chosen UUID to
+# stdout. Uses fzf if available, otherwise a numbered prompt.
+_cpy_pick_session() {
+    local files=("$@")
+    local -a lines
+    local f uuid name updated mtime
+    for f in "${files[@]}"; do
+        uuid="${f:h:t}"
+        mtime=$(stat -f "%m" "$f" 2>/dev/null) || continue
+        updated=$(date -r "$mtime" "+%Y-%m-%d %H:%M" 2>/dev/null)
+        name=$(awk '/^name: /{sub(/^name: /,""); print; exit}' "$f" 2>/dev/null)
+        [[ -z "$name" ]] && name="(unnamed)"
+        # Format: mtime|display|uuid (mtime first for numeric sort)
+        lines+=("${mtime}|${updated}  ${name}  ${uuid:0:8}|${uuid}")
+    done
+
+    local sorted
+    sorted=$(printf '%s\n' "${lines[@]}" | sort -t'|' -k1,1 -rn)
+
+    local choice_uuid=""
+    if command -v fzf >/dev/null 2>&1; then
+        local picked
+        picked=$(printf '%s\n' "$sorted" | awk -F'|' '{print $2"\t"$3}' \
+            | fzf --with-nth=1 --delimiter=$'\t' \
+                  --prompt="Resume session > " \
+                  --height=40% --reverse)
+        [[ -n "$picked" ]] && choice_uuid="${picked##*$'\t'}"
+    else
+        local -a display_lines uuids
+        local line disp uu
+        while IFS= read -r line; do
+            disp="${${line#*|}%|*}"
+            uu="${line##*|}"
+            display_lines+=("$disp")
+            uuids+=("$uu")
+        done <<< "$sorted"
+
+        local i=1 sel
+        for disp in "${display_lines[@]}"; do
+            print -u2 -- "$i) $disp"
+            ((i++))
+        done
+        print -nu2 -- "Select [1-${#display_lines}]: "
+        read sel
+        if [[ "$sel" =~ ^[0-9]+$ ]] && (( sel >= 1 && sel <= ${#display_lines} )); then
+            choice_uuid="${uuids[$sel]}"
+        fi
+    fi
+    print -r -- "$choice_uuid"
 }
 
 # zellij-health: list every running Zellij server with CPU%, age, and PID,
