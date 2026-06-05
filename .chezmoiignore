@@ -1,1 +1,13 @@
 README.md
+
+# Work/private values sourced by ~/.config/zsh/functions.zsh.
+# Never track this file; it holds internal hostnames.
+.config/zsh/private.zsh
+
+# htop rewrites this on every exit (sort_key, columns, etc.) — too noisy to track.
+.config/htop/htoprc
+
+# Symlinks to ~/.agents/skills/. Personal skills are tracked at the real
+# location under dot_agents/skills/; work skills stay untracked there.
+.copilot/skills
+.claude/skills
