@@ -2,6 +2,12 @@
 
 # Shell functions
 
+# Source work/private overrides (hostnames, internal URLs, etc).
+# This file is NOT tracked by chezmoi, so values here never land in the
+# public dotfiles repo. Add private values (and any functions that
+# reference internal tooling) to ~/.config/zsh/private.zsh. The loop
+# in ~/.zshrc sources every *.zsh file in ~/.config/zsh/ automatically.
+
 function cheat() {
   curl https://cheat.sh/"${1}"
 }
