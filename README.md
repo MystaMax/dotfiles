@@ -42,6 +42,7 @@ This is a chezmoi **template** — `name`, `email`, and `signingkey` are populat
 
 | File | Target | Description |
 |---|---|---|
+| `dot_config/herdr/config.toml` | `~/.config/herdr/config.toml` | Herdr, Ctrl+A prefix, tmux-style keybindings, and dot status indicators |
 | `dot_config/tmux/tmux.conf` | `~/.config/tmux/tmux.conf` | [tmux](https://github.com/tmux/tmux) — 256 color, custom prefix, vim-style pane navigation, mouse support |
 | `dot_config/zellij/config.kdl` | `~/.config/zellij/config.kdl` | [Zellij](https://zellij.dev/) — full custom keybinding configuration with clear-defaults |
 

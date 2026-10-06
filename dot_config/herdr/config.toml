@@ -1,0 +1,33 @@
+onboarding = false
+[keys]
+prefix = "ctrl+a"
+
+goto = ["prefix+s", "prefix+g"]
+settings = "prefix+shift+s"
+detach = "prefix+d"
+reload_config = "prefix+r"
+resize_mode = "prefix+shift+r"
+
+rename_workspace = ["prefix+$", "prefix+shift+w"]
+rename_tab = ["prefix+comma", "prefix+shift+t"]
+close_tab = ["prefix+ampersand", "prefix+shift+x"]
+
+split_vertical = ["prefix+v", "prefix+|", "prefix+backslash", "prefix+percent"]
+split_horizontal = ["prefix+minus", "prefix+double_quote"]
+
+focus_pane_left = ["prefix+h", "prefix+left"]
+focus_pane_down = ["prefix+j", "prefix+down"]
+focus_pane_up = ["prefix+k", "prefix+up"]
+focus_pane_right = ["prefix+l", "prefix+right"]
+
+cycle_pane_next = ["prefix+o", "prefix+tab"]
+open_notification_target = "prefix+shift+o"
+last_pane = "prefix+semicolon"
+
+resize_pane_left = "prefix+ctrl+left"
+resize_pane_down = "prefix+ctrl+down"
+resize_pane_up = "prefix+ctrl+up"
+resize_pane_right = "prefix+ctrl+right"
+
+[ui]
+status_indicators = "dots"
