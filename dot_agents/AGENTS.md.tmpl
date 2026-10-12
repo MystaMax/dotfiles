@@ -1,0 +1,136 @@
+# Global Instructions
+
+## Dependency & Install Policy
+
+Keep the host machine clean. Default to project-local installs. Never mutate
+global or system package state without my explicit approval.
+
+### Allowed without asking (project-scoped)
+
+Install and build inside the project directory using project-scoped tools:
+
+- **Node:** `npm`/`pnpm`/`yarn install` into the local `node_modules`; use `npx <tool>` for one-off tools.
+- **Python:** `uv` (preferred), via `uv add`, `uv sync`, `uv run`, or a project `venv`. Never the system interpreter.
+- **Ruby:** `bundle install` scoped to the project (e.g. `vendor/bundle`).
+- **Rust / Go:** `cargo build`/`cargo add`, `go build`/`go get` within the project module.
+- **Runtimes:** pin per-project with `mise use <tool>@<version>` (recorded in the project's mise config).
+- **Isolation:** prefer a `devcontainer` or Docker for complex or system-level dependencies.
+
+### Stop and ask first (global / system state)
+
+Treat the following as a hard stop. Do not run them, even in auto-approve or yolo
+mode. Pause, tell me exactly what you want to install and why, then wait for my
+explicit go-ahead:
+
+- Homebrew: `brew install`, `brew upgrade`.
+- Global Node: `npm i -g`, `pnpm add -g`, `yarn global add`.
+- System or user Python: `pip install` outside a venv, `pip install --user`, `pipx install`, `uv tool install`, `uv pip install --system`.
+- Global binaries: `cargo install`, `go install`, `gem install` (non-bundler).
+- OS package managers: `apt`, `dnf`, `pacman`, `port`, etc.
+- Global runtime defaults: `mise use -g`, `asdf global`.
+- Anything with `sudo`; writes to `/usr/local`, `/opt`, or `~/.local/bin`; or a remote installer piped to a shell (`curl ... | sh`) that writes outside the project.
+
+### Principle
+
+The ban targets changes to global or system package state. Project-scoped
+installs and the sanctioned isolation tools above (npx, uv/venv, bundler-local,
+per-project mise, Docker/devcontainer) are always fine, even when a tool caches
+data under `~/`. When in doubt, choose the isolated option or ask.
+
+## Git Commit Messages
+
+Use the `git-commit` skill for commit message formatting and conventions.
+
+## Coding Preferences
+
+- Only comment code that is non-obvious or requires clarification.
+- Prefer readability over cleverness.
+- Follow the naming conventions of the language being used (e.g., `snake_case` in Python/Ruby, `camelCase` in JavaScript/TypeScript, `PascalCase` for types/classes).
+- Keep functions small and focused on a single responsibility.
+- Handle errors explicitly; avoid silently swallowing exceptions.
+- Prefer early returns over deeply nested conditionals.
+- Prefer `rg` (ripgrep) over `grep` for searching file contents.
+
+## Writing Style & Formatting
+
+- Never use em dashes. Instead, use periods, commas, colons, semicolons, or parentheses as appropriate.
+
+## File Naming
+
+For artifacts such as recordings, screenshots, downloads, uploads, exports, and research files, use:
+`<kebab-case-description>-<YYYYMMDDTHHMMSS>.<ext>`
+
+Example: `call-woolys-cycles-of-atlanta-20260922T170401.m4a`.
+
+- Use a lowercase description with words separated by hyphens; remove other special characters.
+- Keep the original file extension.
+- Use a timestamp in ISO 8601 basic format, `YYYYMMDDTHHMMSS`, in local time. Prefer the file's capture, upload, or creation time; otherwise use the current local time.
+- If the name already exists, append a numeric suffix or source ID before the extension instead of overwriting.
+- Copy rather than move when the original location matters, unless asked to move.
+
+Preserve established or required names for source code, project files, and configuration files (for example, `AGENTS.md`).
+
+## Asking for Decisions
+
+- Present findings, comparisons, and recommendations in the conversation before requesting a decision.
+- Keep the decision request short, with clear options and a recommended default when appropriate.
+- If a structured question tool or interactive form is available, use it. Put only the question and concise options in the form, not the report.
+- Otherwise, ask a concise question in the conversation and wait for an answer before taking the action that requires the decision.
+- Do not repeat the preceding explanation inside the decision request.
+{{ if .workMachine }}
+## Ship-bound drafts must pass `content-validator`
+
+Apply these rules when drafting support communications. Use the `content-validator`
+skill before completing a ship-bound draft, with the matching audience:
+
+- Customer-facing Zendesk reply: `--audience customer`
+- Zendesk internal note: `--audience internal-note`
+- Slack message (any channel, DM, thread): `--audience slack`
+- Engineering escalation issue body: `--audience escalation`
+- `github/customer-feedback` issue or add-customer comment: `--audience feedback-issue`
+- `github/helphub-knowledge-base` health-check PR review: `--audience health-check`
+
+Run:
+
+```bash
+uv run --script ~/.agents/skills/content-validator/scripts/validate.py \
+  --audience <audience> --file <path-to-draft> --fix --json
+```
+
+Do not declare a draft complete until `summary.blocks_unresolved` is `0` and every
+`semantic_checklist` item has been addressed explicitly. If the skill or required
+tools are unavailable, stop and report that validation is blocked rather than
+skipping it. This check catches recurring formatting and drafting mistakes,
+including em dashes, broken Zendesk formatting, wrong Slack channel scope,
+file-path leaks, jargon, and unflagged inference.
+{{ end }}
+## Language-Specific
+
+### Python
+
+- Use `uv` for package and environment management. Avoid `pip`.
+- Use `ruff` for linting and formatting. Avoid `black`, `isort`, and `flake8`.
+
+## Environment
+
+- **OS:** macOS (primary), Linux
+- **Shell:** zsh
+- **Terminal:** Ghostty with Zellij
+- **Editor:** Neovim (primary), VS Code
+- **Dev Containers:** Preferred for new projects when practical. Suggest devcontainer setup for new projects, but don't force it on existing ones. Always include the `yzhang.markdown-all-in-one` VS Code extension.
+{{ if .workMachine }}
+## Context hygiene on long ticket sessions
+
+Keep large bundle dumps, ticket exports, and research output out of the main
+conversation so long GHES ticket sessions remain usable.
+
+- **Delegate large reads when supported.** Use a separate agent for bundle analysis, ticket-export mining, and multi-file research. Ask for conclusions rather than raw material.
+- **Use `/ask` for side questions when supported.** It answers without adding to conversation history.
+- **Prefer targeted searches and ranged reads over full-file mentions.** Active ticket exports can be very large. Use `rg` and `view_range`, or equivalent tools, instead of loading entire `zd{id}.md` files.
+- **Use `ticket-resume` at around 60% context when available.** Reset from saved state instead of requesting a larger context window. See `~/.agents/skills/ticket-resume/SKILL.md`.
+{{ end }}
+## Skills
+
+- **Source of truth:** `~/.agents/skills/` is the canonical location for all skills. Always look here first.
+- **Symlinks:** Agent-specific skills paths may point to `~/.agents/skills/`. Resolve the symlink rather than treating it as a separate collection.
+- When searching for skills, modifying skills, or referencing skill paths, always use `~/.agents/skills/` as the authoritative directory.

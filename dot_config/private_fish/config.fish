@@ -5,6 +5,5 @@ end
 starship init fish | source
 
 # Added by LM Studio CLI (lms)
-set -gx PATH $PATH /Users/mystamax/.lmstudio/bin
+set -gx PATH $PATH $HOME/.lmstudio/bin
 # End of LM Studio CLI section
-

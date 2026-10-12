@@ -7,7 +7,15 @@ README.md
 # htop rewrites this on every exit (sort_key, columns, etc.) — too noisy to track.
 .config/htop/htoprc
 
-# Symlinks to ~/.agents/skills/. Personal skills are tracked at the real
-# location under dot_agents/skills/; work skills stay untracked there.
+# Agent entry points refer to the canonical skills location.
 .copilot/skills
 .claude/skills
+
+{{ if .workMachine }}
+# The separate work-skills repository owns this directory on work machines.
+.agents/skills
+.agents/skills/**
+
+# Firecrawl credentials are only used on personal machines.
+.config/zsh/env.zsh
+{{ end }}

@@ -10,10 +10,10 @@ These dotfiles are designed for **macOS** (with some Linux support where noted) 
 
 | File | Target | Description |
 |---|---|---|
-| `dot_zshrc` | `~/.zshrc` | Main shell config — history, keybindings, completions, plugin loading, PATH, and environment variables |
+| `dot_zshrc.tmpl` | `~/.zshrc` | Main shell config with portable PATH entries and a personal-machine local-bin addition |
 | `dot_zprofile` | `~/.zprofile` | Login shell setup — Homebrew and OrbStack initialization |
 | `dot_config/zsh/aliases.zsh` | `~/.config/zsh/aliases.zsh` | Shell aliases — navigation (`eza`), SSH helpers, quick-edit shortcuts, tool replacements (`bat`, `prettyping`), and platform-specific port listing |
-| `dot_config/zsh/functions.zsh` | `~/.config/zsh/functions.zsh` | Shell functions — `cheat` (cheat.sh lookup), `gi` (gitignore generator), `jql` (colored jq pager), `zd`/`zdt` (support ticket directory management), `slackread` (Slack thread reader via `gh`) |
+| `dot_config/zsh/functions.zsh.tmpl` | `~/.config/zsh/functions.zsh` | Shared shell functions, preserving the work and personal variants of the `cpy` session wrapper |
 
 **Zsh plugins** (installed separately via automation, sourced from `~/.config/zsh/plugins/`):
 
@@ -30,6 +30,35 @@ These dotfiles are designed for **macOS** (with some Linux support where noted) 
 | `private_dot_gitconfig.tmpl` | `~/.gitconfig` | Git config (chezmoi template) — uses 1Password SSH signing for commit signatures, VS Code as diff tool, LFS support |
 
 This is a chezmoi **template** — `name`, `email`, and `signingkey` are populated from `chezmoi init` data rather than being hardcoded.
+
+The existing reference-repository maintenance registration is included only on
+work machines, using `~/github/repos/github`. This does not clone the repository
+or configure scheduled maintenance.
+
+### AI Agent Instructions and Skills
+
+| Source | Target |
+|---|---|
+| `dot_agents/AGENTS.md.tmpl` | `~/.agents/AGENTS.md` |
+| `dot_claude/symlink_CLAUDE.md.tmpl` | `~/.claude/CLAUDE.md` |
+| `dot_codex/symlink_AGENTS.md.tmpl` | `~/.codex/AGENTS.md` |
+| `dot_gemini/symlink_GEMINI.md.tmpl` | `~/.gemini/GEMINI.md` |
+| `private_dot_copilot/symlink_copilot-instructions.md.tmpl` | `~/.copilot/copilot-instructions.md` |
+
+All four agent-specific instruction paths are symlinks to the generated central
+file. Shared rules apply everywhere; support-draft validation and ticket-session
+guidance appear only on work machines. Edit the source template, not the
+generated file, and do not add a second plain-file source for the same target.
+
+On work machines, the separate `work-skills` repository owns
+`~/.agents/skills`, and chezmoi ignores that directory and its contents.
+Personal machines retain the selected shared skills managed in
+`dot_agents/skills`. Existing agent skills links remain separate from
+instruction-file management.
+
+The Firecrawl environment template, `dot_config/zsh/private_env.zsh.tmpl`, is
+managed only on personal machines. It reads its API key from 1Password;
+plaintext keys must never be committed. Work machines skip this target.
 
 ### Terminal Emulators
 
@@ -101,7 +130,19 @@ This is a chezmoi **template** — `name`, `email`, and `signingkey` are populat
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply MystaMax
 ```
 
-You'll be prompted for template values (name, email, signing key) on first run.
+You'll be prompted for your name, email, SSH signing public key, and whether
+this is a work machine. Existing answers are reused. The machine role is stored
+locally, not committed:
+
+```toml
+[data]
+workMachine = true
+```
+
+Use `true` for a work machine and `false` for a personal machine. To change the
+role, update that value in `~/.config/chezmoi/chezmoi.toml`, review the targeted
+diffs, and apply only the intended changes. Adding role-aware templates does not
+install applications, clone work repositories, or remove unmanaged skills.
 
 ### Day-to-Day Usage
 

@@ -195,13 +195,15 @@ PROMPT_EOL_MARK=''
 set +o nomatch
 
 # bun completions
-[ -s "/Users/mystamax/.bun/_bun" ] && source "/Users/mystamax/.bun/_bun"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/mystamax/.lmstudio/bin"
+export PATH="$PATH:$HOME/.lmstudio/bin"
 # End of LM Studio CLI section
-
+{{ if not .workMachine }}
+export PATH="$HOME/.local/bin:$PATH"
+{{ end }}
