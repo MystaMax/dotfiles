@@ -1,4 +1,8 @@
 onboarding = false
+
+[session]
+resume_agents_on_restore = false
+
 [keys]
 prefix = "ctrl+a"
 
@@ -30,4 +34,7 @@ resize_pane_up = "prefix+ctrl+up"
 resize_pane_right = "prefix+ctrl+right"
 
 [ui]
-status_indicators = "dots"
+status_indicators = "symbols"
+
+[ui.toast]
+delivery = "off"
