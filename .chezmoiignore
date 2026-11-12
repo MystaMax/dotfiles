@@ -1,5 +1,14 @@
 README.md
 
+# Herdr app settings stay local, including display zoom.
+.config/herdr-app/settings.json
+
+{{ if ne .chezmoi.os "darwin" }}
+# This keymap and its personal mods are macOS-only.
+.config/herdr-app
+.config/herdr-app/**
+{{ end }}
+
 # Work/private values sourced by ~/.config/zsh/functions.zsh.
 # Never track this file; it holds internal hostnames.
 .config/zsh/private.zsh

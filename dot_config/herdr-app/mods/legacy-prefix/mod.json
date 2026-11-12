@@ -1,0 +1,12 @@
+{
+  "place": "none",
+  "title": "Herdr prefix",
+  "overlay": {
+    "kind": "popup",
+    "frame": "none",
+    "at": "top",
+    "offset": 0,
+    "width": 1,
+    "height": 1
+  }
+}

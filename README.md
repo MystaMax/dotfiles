@@ -75,6 +75,94 @@ plaintext keys must never be committed. Work machines skip this target.
 | `dot_config/tmux/tmux.conf` | `~/.config/tmux/tmux.conf` | [tmux](https://github.com/tmux/tmux) — 256 color, custom prefix, vim-style pane navigation, mouse support |
 | `dot_config/zellij/config.kdl` | `~/.config/zellij/config.kdl` | [Zellij](https://zellij.dev/) — full custom keybinding configuration with clear-defaults |
 
+### Herdr App
+
+The new Herdr app configuration is separate from the legacy Herdr CLI config.
+On macOS, chezmoi manages exactly these files under `~/.config/herdr-app/`:
+
+- `keys.json`
+- `mods/legacy-prefix/main.js` and `mods/legacy-prefix/mod.json`
+- `mods/named-space/main.js` and `mods/named-space/mod.json`
+
+The keymap uses Ctrl+A prefix shortcuts, macOS terminal word-editing shortcuts,
+and a required-name dialog on Cmd+N and Ctrl+A then Shift+N. Cancel creates
+nothing. Other built-in space-creation routes retain their normal behavior.
+
+`settings.json`, including zoom, stays local on every machine. The entire
+Herdr app subtree is ignored on other operating systems. Generated guides,
+type definitions, `jsconfig.json`, sockets, window/session state, telemetry,
+caches, layouts, and shipped mods are not managed. Never recursively add the
+app directory or manage it as an exact directory.
+
+After editing the live keymap or either personal mod, capture only these files
+before applying an older source copy:
+
+```bash
+herdr_targets=(
+  "$HOME/.config/herdr-app/keys.json"
+  "$HOME/.config/herdr-app/mods/legacy-prefix/main.js"
+  "$HOME/.config/herdr-app/mods/legacy-prefix/mod.json"
+  "$HOME/.config/herdr-app/mods/named-space/main.js"
+  "$HOME/.config/herdr-app/mods/named-space/mod.json"
+)
+chezmoi re-add "${herdr_targets[@]}"
+herdr-app check "$HOME/.config/herdr-app/mods/legacy-prefix"
+herdr-app check "$HOME/.config/herdr-app/mods/named-space"
+herdr-app status
+```
+
+Review and commit only the intended source paths. Do not capture generated
+files or local settings.
+
+#### Deploying to another Mac
+
+Herdr app and this chezmoi repository must already be installed. Confirm the
+source checkout is clean on `main`, origin is the intended dotfiles repository,
+and `HERDR_APP_HOME` is unset or points to `~/.config/herdr-app`. Stop if those
+conditions do not hold. Preserve any work-only key bindings before replacing
+the full keymap. Do not upgrade or restart the app just to apply these files.
+
+First back up the five targets with the backup skill's workflow: separate
+timestamped `.tgz` archives in `~/backups/`, relative archive members, default
+`.DS_Store`/`Thumbs.db` exclusions, and verified contents. Record missing files
+so recovery can distinguish a new file from an overwritten one. Leave settings
+out of the archives and record their hash for comparison.
+
+Pull source without applying anything, then define `herdr_targets` as above:
+
+```bash
+chezmoi git -- status --short --branch
+chezmoi git -- remote -v
+chezmoi git -- pull --ff-only origin main
+chezmoi git -- log -1 --format='%H %s'
+chezmoi --no-pager --use-builtin-diff diff --exclude=scripts "${herdr_targets[@]}"
+chezmoi apply --dry-run --verbose --exclude=scripts "${herdr_targets[@]}"
+```
+
+Stop and review the diff before continuing. Only the five selected files should
+change. A bare `chezmoi update` also applies other pending dotfiles, so avoid it
+for this targeted deployment.
+
+```bash
+chezmoi apply --interactive --exclude=scripts "${herdr_targets[@]}"
+chezmoi verify --exclude=scripts "${herdr_targets[@]}"
+herdr-app check "$HOME/.config/herdr-app/mods/legacy-prefix"
+herdr-app check "$HOME/.config/herdr-app/mods/named-space"
+herdr-app status
+```
+
+Keys and mods reload live. Confirm local settings are unchanged and try prefix
+help/cancellation, word editing, Cmd+period, and the naming dialog. Render
+checks do not prove keyboard behavior.
+
+For recovery, inspect each recorded archive with `tar -tzf`, then restore its
+specific relative member with `tar -xzf ARCHIVE -C "$HOME/.config/herdr-app"
+MEMBER`. Remove only individual files recorded as absent before deployment,
+if needed. Never delete the app directory or whole mod trees. Reconcile source
+before applying again. Undo a published mistake with a focused revert commit,
+not a force-push; a Git revert alone does not restore previously unmanaged
+target files.
+
 ### Editors
 
 | File | Target | Description |
